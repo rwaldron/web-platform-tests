@@ -5,16 +5,35 @@
 <div id="log"></div>
 <iframe src="003-1.html"></iframe>
 <script>
+/*---
+specid: navigating-across-documents
+steps: [3, 4, 6]
+info: |
+  If there is a preexisting attempt to navigate browsingContext, and the source browsing context is the same as browsingContext, and that attempt is currently running the unload a document algorithm, then abort these steps without affecting the preexisting attempt to navigate browsingContext.
+
+  If the prompt to unload algorithm is being run for the active document of browsingContext, then abort these steps without affecting the prompt to unload algorithm.
+
+  Cancel any preexisting but not yet mature attempt to navigate browsingContext, including canceling any instances of the fetch algorithm started by those attempts. If one of those attempts has already created and initialized a new Document object, abort that Document also. (Navigation attempts that have matured already have session history entries, and are therefore handled during the update the session history with the new page algorithm, later.)
+
+description: |
+  1. 003.html has an `onmessage` handler to receive messages and store them in `messages`.
+  2. 003-1.html has an `onload` handler, which sends the message "003-1" to 003.html (`messages` will be `["003-1"]`), then sets `location` to 003-2.html ~100ms later
+  3. 003-2.html has an `onunload` handler, which sets `location` to 003-3.html. This `onunload` will be triggered by `history.go(-1)`, but the attempt to set `location` to 003-3.html. This must NOT be allowed, per https://github.com/whatwg/html/commit/2a11eef8f92b0335328890dc2cb1e281d18553eb.
+  4. 003-2.html has an `onload` handler, which sends the message "003-2" to 003.html (`messages` will be `["003-1", "003-2"]`), then calls `history.go(-1)` after a 0ms timeout.
+    a. `history.go(-1)` navigates browsingContext to the last _session history entry_ (003-1.html).
+    b. 003-1.html has an `onload` handler, which sends the message "003-1" to 003.html. Now `messages` will be `["003-1", "003-2", "003-1"]`, which satisfies the condition in the handler that then compares `messages` to an expected array of values, ends the test and removes the iframe.
+      i. Removal of the iframe prevents the function in the ~100ms timeout from being executed.
+
+
+---*/
 var t = async_test();
-
-var pages = [];
 var iframe = document.getElementsByTagName("iframe")[0];
-
+var messages = [];
 
 onmessage = t.step_func(function(e) {
-  pages.push(e.data);
-  if(pages.length == 3) {
-    assert_array_equals(pages, ["003-1", "003-2", "003-1"]);
+  messages.push(e.data);
+  if (messages.length === 3) {
+    assert_array_equals(messages, ["003-1", "003-2", "003-1"]);
     t.done();
     iframe.parentNode.removeChild(iframe);
   }

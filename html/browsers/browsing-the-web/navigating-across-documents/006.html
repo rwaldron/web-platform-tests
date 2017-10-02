@@ -1,5 +1,5 @@
 <!doctype html>
-<title>Link with onclick form submit and href navigation </title>
+<title>Link with onclick form submit is aborted by href navigation </title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
@@ -7,8 +7,29 @@
 <form target="test" action="click.html"></form>
 <a target="test" onclick="document.forms[0].submit()" href="href.html">Test</a>
 <script>
+/*---
+specid: navigating-across-documents
+steps: [6, 11, 12]
+info: |
+  Cancel any preexisting but not yet mature attempt to navigate browsingContext, including canceling any instances of the fetch algorithm started by those attempts. If one of those attempts has already created and initialized a new Document object, abort that Document also. (Navigation attempts that have matured already have session history entries, and are therefore handled during the update the session history with the new page algorithm, later.)
+
+  Step 12 contains https://html.spec.whatwg.org/multipage/browsing-the-web.html#javascript-protocol
+
+  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#concept-form-submit
+  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#submit-get-action
+  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#plan-to-navigate
+  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#planned-navigation
+
+description: |
+  This test is operationally equivalent to 005.html with the exeption that:
+    - 006.html creates a form element with a `target` of `test` and an `action` of `click.html`
+    - the onclick handler of the anchor element in 006.html selects the form and submits that in the DOM and submits it with the click.html action on the test iframe target instead of updating the window.location of the iframe directly.
+    - just like 005.html, this tests checks to make sure the href is handled and the onclick's behaviour is aborted before reaching maturity per step 6 of 7.8.1
+---*/
 var t = async_test();
-t.step(function() {document.links[0].click()});
+t.step(function() {
+  document.getElementsByTagName("a")[0].click();
+});
 onmessage = t.step_func(
   function(e) {
     assert_equals(e.data, "href");
