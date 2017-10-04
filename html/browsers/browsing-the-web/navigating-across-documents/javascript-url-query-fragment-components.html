@@ -25,8 +25,8 @@ description: |
 <iframe id="c" src='javascript:"%2525"'></iframe>
 
 <script>
-var t = async_test(undefined, {
-  timeout:1000
+var test = async_test(undefined, {
+  timeout: 1000
 });
 function check(id, expected) {
   assert_equals(
@@ -34,10 +34,10 @@ function check(id, expected) {
     expected
   );
 }
-onload = t.step_func(function() {
+window.onload = test.step_func(function() {
   check("a", "yep");
   check("b", "ok");
   check("c", "%25");
-  t.done();
+  test.done();
 });
 </script>

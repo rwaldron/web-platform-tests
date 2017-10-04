@@ -20,13 +20,13 @@ description: |
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <script>
-var t = async_test();
+var test = async_test();
 var reports = [];
-onmessage = t.step_func(function(e) {
+onmessage = test.step_func(function(e) {
   reports.push(e.data);
   if (reports.length == 3) {
     assert_array_equals(reports, ["initial", "inner", "destination"]);
-    t.done();
+    test.done();
   }
 });
 </script>

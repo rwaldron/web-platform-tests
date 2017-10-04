@@ -18,19 +18,19 @@ description: |
 <div id="log"></div>
 <iframe  id="test" name="test" src="empty_fragment_iframe.html"></iframe>
 <script>
-var t = async_test();
+var test = async_test();
 var count = 0;
 var iframe = document.querySelector('iframe');
 
-iframe.onload = t.step_func(function() {
+iframe.onload = test.step_func(function() {
   // If the navigation were not aborted, we would expect multiple load events
   // as the page continually reloads itself.
   count++;
 });
 
-onmessage = t.step_func(function(e) {
+window.onmessage = test.step_func(function(e) {
   assert_equals(e.data, "");
   assert_equals(count, 1);
-  t.done();
+  test.done();
 });
 </script>

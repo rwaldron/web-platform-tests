@@ -30,19 +30,19 @@ description: |
 <iframe id="e" src='javascript:var $a = Number.MAX_SAFE_INTEGER; `${%24a}`;'></iframe>
 
 <script>
-var t = async_test(undefined, {timeout:1000});
+var test = async_test(undefined, {timeout:1000});
 function check(id, expected) {
   assert_equals(
     document.getElementById(id).contentDocument.body.textContent,
     expected
   );
 }
-onload = t.step_func(function() {
+window.onload = test.step_func(function() {
   check("a", "a");
   check("b", "%25%");
   check("c", "");
   check("d", "");
   check("e", String(Number.MAX_SAFE_INTEGER));
-  t.done();
+  test.done();
 });
 </script>

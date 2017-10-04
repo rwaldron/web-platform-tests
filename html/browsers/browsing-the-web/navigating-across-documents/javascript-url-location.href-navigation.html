@@ -17,12 +17,12 @@ description: |
 <div id="log"></div>
 <iframe id="a" src='javascript:location.href="href.html";'></iframe>
 <script>
-var t = async_test(undefined, {
+var test = async_test(undefined, {
   timeout:1000
 });
 var iframe = document.querySelector("iframe");
-onmessage = t.step_func(function(e) {
+window.onmessage = t.step_func(function(e) {
   assert_equals(e.data, "href");
-  t.done();
+  test.done();
 });
 </script>

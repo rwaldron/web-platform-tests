@@ -23,17 +23,17 @@ description: |
 <iframe id="test" name="test"></iframe>
 <a target="test" onclick="parent.reports.push('click');" href="javascript:parent.reports.push(location.href);">Test</a>
 <script>
-var t = async_test(undefined, {
+var test = async_test(undefined, {
   timeout:4000
 });
 var reports = [];
-t.step(function() {
-  document.getElementsByTagName("a")[0].click();
+test.step(function() {
+  document.querySelector("a").click();
   reports.push("after click");
 });
-onload = t.step_func(function() {
+window.onload = test.step_func(function() {
   // javascript: executions are async.
   assert_array_equals(reports, ["click", "after click", "about:blank"]);
-  t.done();
+  test.done();
 });
 </script>

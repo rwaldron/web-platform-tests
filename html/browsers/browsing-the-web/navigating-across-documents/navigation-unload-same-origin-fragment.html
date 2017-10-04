@@ -1,29 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
+<!--/
+specs:
+  - id: browsers.html#navigating-across-documents
+  - id: browsing-the-web.html#scroll-to-fragid
+
+description: |
+  Similar to 006, 008 & 009.
+
+  1. Creates an iframe with src="navigation-unload-same-origin-fragment-1.html",
+      which does nothing.
+  2. Set an unload handler on the iframe, which will attempt to set the location.hash
+      of the iframe. This must not block navigation.
+  3. Set the location.href of the iframe, which will trigger the unload handler.
+
+/-->
 <meta charset="utf-8">
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <link rel="help" href="https://html.spec.whatwg.org/multipage/browsers.html#navigating-across-documents">
 <link rel="author" title="Domenic Denicola" href="mailto:d@domenic.me">
 
-<iframe id="i" src="navigation-unload-same-origin-fragment-1.html"></iframe>
+<iframe src="navigation-unload-same-origin-fragment-1.html"></iframe>
 
-<!-- a timeout indicates that setting i.contentWindow.location.hash (a second navigation) aborted the first navigation,
-    and so it stayed on a.html and finishedLoading was never called -->
+<!--
+  a timeout indicates that setting iframe.contentWindow.location.hash
+    (a second navigation) aborted the first navigation,
+    and so it stayed on a.html and finishedLoading was never called
+-->
 
 <script>
-var test = async_test('Tests that a fragment navigation in the unload handler will not block the initial navigation');
-window.onload = test.step_func(function() {
-    var i = document.querySelector('#i');
+var test = async_test('Fragment navigation in the unload handler will not block the initial navigation');
+var iframe = document.querySelector('iframe');
 
-    i.contentWindow.onunload = test.step_func(function() {
-        i.contentWindow.location.hash = '#fragment';
-    });
-
-    window.finishedLoading = test.step_func_done(function () {
-        assert_equals(i.contentWindow.location.pathname.split('/').pop(), 'navigation-unload-same-origin-fragment-2.html');
-        assert_equals(i.contentWindow.location.hash, '');
-    });
-
-    i.contentWindow.location.href = 'navigation-unload-same-origin-fragment-2.html';
+window.onmessage = test.step_func_done(function(e) {
+  assert_equals(e.data, "done");
+  assert_equals(iframe.contentWindow.location.hash, "");
 });
+
+iframe.contentWindow.onunload = test.step_func(function() {
+  iframe.contentWindow.location.hash = "#fragment";
+});
+
+iframe.contentWindow.location.href = "navigation-unload-same-origin-fragment-2.html";
 </script>

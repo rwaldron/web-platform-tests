@@ -5,8 +5,10 @@ specid:
     step: [6]
 
 description: |
-  1. The iframe src is set to 002-1.html (with a response that will be delayed by 1s)
-  2. Before that navigation is complete (~500ms later), the iframe src will be set to 002-2.html, which **must** cancel the "not yet mature" navigation.
+  1. The iframe src is set to 002-1.html (with a response that will be
+      delayed by 1s)
+  2. Before that navigation is complete (~500ms later), the iframe src will be
+      set to 002-2.html, which **must** cancel the "not yet mature" navigation.
 
 /-->
 <title>Multiple simultaneous navigations</title>
@@ -15,21 +17,21 @@ description: |
 <div id="log"></div>
 <iframe src="about:blank"></iframe>
 <script>
-var t = async_test();
-var iframe = document.getElementsByTagName("iframe")[0];
+var test = async_test();
+var iframe = document.querySelector("iframe");
 
-onload = t.step_func(function() {
-  setTimeout(t.step_func(function() {
+window.onload = test.step_func(function() {
+  setTimeout(test.step_func(function() {
     iframe.src = "002-1.html?pipe=trickle(d1)";
-    setTimeout(t.step_func(function() {
+    setTimeout(test.step_func(function() {
       iframe.src = "002-2.html"
     }), 500);
   }), 100);
 });
 
-onmessage = t.step_func(function(e) {
+window.onmessage = test.step_func(function(e) {
   assert_equals(e.data, "002-2");
-  t.done();
+  test.done();
 });
 
 </script>

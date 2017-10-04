@@ -6,8 +6,12 @@ specs:
 
 description: |
   1. Creates an iframe: `<iframe src="001-1.html"></iframe>`
-  2. Creates an `onload` handler which will set a new src to the iframe (001-1.html => 001-2.html)
-  3. 001-1.html has an `onunload` handler, triggered when the iframe src is set to 001-2.html. 001-1.html's `onunload` handler sets `location` to 001-3.html (as a "cross origin" resource, via `location.href.replace("http://", "http://www.")`. This must NOT be allowed, per https://github.com/whatwg/html/commit/2a11eef8f92b0335328890dc2cb1e281d18553eb.
+  2. Creates an `onload` handler which will set a new src to the iframe
+      (001-1.html => 001-2.html)
+  3. 001-1.html has an `onunload` handler, that will attempt to set
+      `location` to 001-3.html (as a "cross origin" resource, via
+      `location.href.replace("http://", "http://www.")`.
+      This must NOT be allowed, per https://github.com/whatwg/html/commit/2a11eef8f92b0335328890dc2cb1e281d18553eb.
 
 /-->
 <title>Cross-origin navigation from unload handler</title>
@@ -16,15 +20,15 @@ description: |
 <div id="log"></div>
 <iframe src="001-1.html"></iframe>
 <script>
-var t = async_test();
-var iframe = document.getElementsByTagName("iframe")[0];
+var test = async_test();
+var iframe = document.querySelector("iframe");
 
-onload = t.step_func(function() {
+window.onload = test.step_func(function() {
   iframe.src = iframe.src.replace(/\d{3}-\d\.html/, "001-2.html");
 });
 
-onmessage = t.step_func(function(e) {
+window.onmessage = test.step_func(function(e) {
   assert_equals(e.data, "001-2");
-  t.done();
+  test.done();
 });
 </script>

@@ -20,15 +20,15 @@ description: |
 <div id="log"></div>
 <iframe src="003-1.html"></iframe>
 <script>
-var t = async_test();
-var iframe = document.getElementsByTagName("iframe")[0];
+var test = async_test();
+var iframe = document.querySelector("iframe");
 var messages = [];
 
-onmessage = t.step_func(function(e) {
+window.onmessage = test.step_func(function(e) {
   messages.push(e.data);
   if (messages.length === 3) {
     assert_array_equals(messages, ["003-1", "003-2", "003-1"]);
-    t.done();
+    test.done();
     iframe.parentNode.removeChild(iframe);
   }
 });
