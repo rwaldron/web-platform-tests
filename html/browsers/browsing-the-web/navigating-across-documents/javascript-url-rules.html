@@ -1,0 +1,48 @@
+<!doctype html>
+<!--/
+specs:
+  - id: browsing-the-web.html#javascript-protocol
+  - id: webappapis.html#run-a-classic-script
+    steps: [10]
+  - id: https://url.spec.whatwg.org/#percent-decode
+  - id: https://encoding.spec.whatwg.org/#utf-8-decode
+
+
+description: |
+  Creates iframes with src="javascript:..." and verifies
+  the contents based on rules specified in steps 3-12
+
+/-->
+<title>javascript: url processing rules</title>
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<div id="log"></div>
+
+<!-- 4, %0a is treated as a byte and turned into "\n" (0x0A is \n), which means "b" is the return value -->
+<iframe id="a" src='javascript:"b";%0a"a";'></iframe>
+<!-- 4, %25 is treated as a byte and turned into "%" (0x25 is %) -->
+<iframe id="b" src='javascript:"%2525%25"'></iframe>
+<!-- 9, Script that will be unsuccessful, result is undefined -->
+<iframe id="c" src='javascript:"use strict"; foo = 1;'></iframe>
+<!-- 10, evaluation was unsuccessful, so result is undefined -->
+<iframe id="d" src='javascript:throw new Error(Number.MAX_SAFE_INTEGER)'></iframe>
+<!-- 9 & 4, %24 is treated as a byte and turned into "$" (0x24 is $) -->
+<iframe id="e" src='javascript:var $a = Number.MAX_SAFE_INTEGER; `${%24a}`;'></iframe>
+
+<script>
+var t = async_test(undefined, {timeout:1000});
+function check(id, expected) {
+  assert_equals(
+    document.getElementById(id).contentDocument.body.textContent,
+    expected
+  );
+}
+onload = t.step_func(function() {
+  check("a", "a");
+  check("b", "%25%");
+  check("c", "");
+  check("d", "");
+  check("e", String(Number.MAX_SAFE_INTEGER));
+  t.done();
+});
+</script>
