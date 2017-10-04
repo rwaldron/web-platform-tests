@@ -2,10 +2,12 @@
 var timeout;
 onload = function() {
   location.hash = "";
-  timeout = setTimeout(function() { parent.child_succeeded() }, 2000);
+  timeout = setTimeout(function() {
+    parent.postMessage(location.hash, "*");
+  }, 2000);
 };
 
 onbeforeunload = function() {
   clearTimeout(timeout);
-}
+};
 </script>
