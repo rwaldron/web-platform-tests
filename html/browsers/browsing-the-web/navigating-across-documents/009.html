@@ -1,4 +1,20 @@
 <!doctype html>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+    steps: [6, 11, 12]
+  - id: browsing-the-web.html#javascript-protocol
+  - id: form-control-infrastructure.html#concept-form-submit
+  - id: form-control-infrastructure.html#submit-get-action
+  - id: form-control-infrastructure.html#plan-to-navigate
+  - id: form-control-infrastructure.html#planned-navigation
+
+description: |
+  1. This test creates a form with `target="test"` and an anchor with both an onclick and href.
+  2. The test "clicks" the anchor, which will trigger the onclick handler operation, which will attempt to submit the form. The form's `action` is a `javascript:` url, which has special handling in step 12
+  3. The form's `action` will complete, followed by navigating the iframe to the anchor's `href=""`.
+
+/-->
 <title>Link with onclick form submit to javascript: url with document.write and href navigation</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
@@ -7,28 +23,6 @@
 <form target="test" action="javascript:document.write('<script>parent.postMessage(&quot;write&quot;, &quot;*&quot;)</script>');"></form>
 <a target="test" onclick="document.forms[0].submit()" href="href.html">Test</a>
 <script>
-/*---
-specid: navigating-across-documents
-steps: [6, 11, 12]
-info: |
-  Cancel any preexisting but not yet mature attempt to navigate browsingContext, including canceling any instances of the fetch algorithm started by those attempts. If one of those attempts has already created and initialized a new Document object, abort that Document also. (Navigation attempts that have matured already have session history entries, and are therefore handled during the update the session history with the new page algorithm, later.)
-
-  Step 12 contains https://html.spec.whatwg.org/multipage/browsing-the-web.html#javascript-protocol
-
-  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#concept-form-submit
-  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#submit-get-action
-  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#plan-to-navigate
-  - https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#planned-navigation
-
-
-
-description: |
-  1. This test creates a form with `target="test"` and an anchor with both an onclick and href.
-  2. The test "clicks" the anchor, which will trigger the onclick handler operation, which will attempt to submit the form. The form's `action` is a `javascript:` url, which has special handling in step 12
-    TODO: Determine if this is supposed to occur in a later task queue.
-  3. The form's `action` will complete, followed by navigating the iframe to the anchor's `href=""`.
-
----*/
 
 var t = async_test();
 var messages = [];

@@ -1,4 +1,14 @@
 <!doctype html>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+    steps: [6]
+
+description: |
+  1. This test creates an anchor with both an onclick and href.
+  2. The test "clicks" the anchor triggering the onclick handler operation, which will attempt to document.write, followed by navigating the iframe to the anchor's `href=""`.
+
+/-->
 <title>Link with onclick document.write and href navigation</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
@@ -6,17 +16,6 @@
 <iframe id="test" name="test"></iframe>
 <a target="test" onclick="document.write('<script>parent.postMessage(&quot;write&quot;, &quot;*&quot;)</script>');" href="href.html">Test</a>
 <script>
-/*---
-specid: navigating-across-documents
-steps: [6]
-info: |
-  Cancel any preexisting but not yet mature attempt to navigate browsingContext, including canceling any instances of the fetch algorithm started by those attempts. If one of those attempts has already created and initialized a new Document object, abort that Document also. (Navigation attempts that have matured already have session history entries, and are therefore handled during the update the session history with the new page algorithm, later.)
-
-description: |
-  1. This test creates an anchor with both an onclick and href.
-  2. The test "clicks" the anchor triggering the onclick handler operation, which will attempt to document.write, followed by navigating the iframe to the anchor's `href=""`.
-
----*/
 var t = async_test();
 var messages = [];
 t.step(function() {

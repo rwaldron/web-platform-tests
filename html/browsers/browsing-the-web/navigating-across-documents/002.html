@@ -1,20 +1,20 @@
 <!doctype html>
+<!--/
+specid:
+  - id: browsing-the-web.html#navigating-across-documents
+    step: [6]
+
+description: |
+  1. The iframe src is set to 002-1.html (with a response that will be delayed by 1s)
+  2. Before that navigation is complete (~500ms later), the iframe src will be set to 002-2.html, which **must** cancel the "not yet mature" navigation.
+
+/-->
 <title>Multiple simultaneous navigations</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <iframe src="about:blank"></iframe>
 <script>
-/*---
-specid: navigating-across-documents
-step: [6]
-info: |
-  Cancel any preexisting but not yet mature attempt to navigate browsingContext, including canceling any instances of the fetch algorithm started by those attempts. If one of those attempts has already created and initialized a new Document object, abort that Document also. (Navigation attempts that have matured already have session history entries, and are therefore handled during the update the session history with the new page algorithm, later.)
-description: |
-  1. The iframe src is set to 002-1.html (with a response that will be delayed by 1s)
-  2. Before that navigation is complete (~500ms later), the iframe src will be set to 002-2.html, which **must** cancel the "not yet mature" navigation.
-
----*/
 var t = async_test();
 var iframe = document.getElementsByTagName("iframe")[0];
 
