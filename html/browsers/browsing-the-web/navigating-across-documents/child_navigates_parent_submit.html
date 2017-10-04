@@ -1,17 +1,32 @@
 <!doctype html>
-<title>Child document navigating parent via submit </title>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+  - id: browsers.html#nested-browsing-context
+
+description: |
+  1. Creates an iframe with src="child_navigates_parent_submit-1.html"
+  2. child_navigates_parent_submit-1.html sends the message "initial" and
+      creates an iframe with src="child_navigates_parent_submit-2.html"
+  3. child_navigates_parent_submit-2.html sends the message "inner" and
+      creates a form element with action="child_navigates_parent_submit-3.html",
+      which it then submits
+  4. child_navigates_parent_submit-3.html sends the message "destination"
+
+/-->
+<title>Child document navigating parent via form submit </title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <script>
-var t = async_test();
-var events = [];
-onmessage = t.step_func(function(e) {
-  events.push(e.data);
-  if (events.length == 3) {
-    assert_array_equals(events, ["initial", "inner", "destination"]);
+var test = async_test();
+var reports = [];
+window.onmessage = test.step_func(function(e) {
+  reports.push(e.data);
+  if (reports.length == 3) {
+    assert_array_equals(reports, ["initial", "inner", "destination"]);
 
-    t.done();
+    test.done();
   }
 });
 </script>

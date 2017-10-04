@@ -1,23 +1,10 @@
-<!DOCTYPE html>
-
-<h1>navigation-unload-form-submit-1.html</h1>
-
+<!doctype html>
+navigation-unload-form-submit-1.html
+<form action="navigation-unload-form-submit-2.html"></form>
 <script>
-let isSubmit = false;
-
-window.unload = function () {
-    window.location = 'is-Submit' + isSubmit;
-}
-
-function setIsSubmit() {
-    isSubmit = true;
-}
-</script>
-
-<form onsubmit="setIsSubmit" action="navigation-unload-form-submit-2.html">
-  <input type="submit">
-</form>
-
-<script>
-parent.finishedLoading();
+window.unload = function() {
+  window.location = "submit.html";
+};
+parent.postMessage("submit-1", "*");
+document.forms[0].submit();
 </script>

@@ -1,7 +1,7 @@
 <!doctype html>
-001-1
+navigation_unload_data_url-1.html
 <script>
-addEventListener("unload", function() {
+window.unload = function() {
   location = "data:text/html,unload<script>parent.postMessage('fail', '*');<\/script>";
-}, false);
+};
 </script>

@@ -1,20 +1,33 @@
 <!doctype html>
+<!--/
+specs:
+  - id: browsers.html#navigating-across-documents
+    steps: [3, 6]
+  - id: browsing-the-web.html#scroll-to-fragid
+
+description: |
+  1. Creates an iframe: `<iframe src="navigation_unload_same_origin-1.html"></iframe>`
+  2. Set an onload handler on this window, which will set a new src to the iframe
+      (navigation_unload_same_origin-1.html => 001-2.html)
+  3. navigation_unload_same_origin-1.html has an `onunload` handler, that will attempt
+      to set `location` to 001-3.html (as a "same origin" resource, via `location.href.replace(/[^\/\.]*\.html/, "001-3.html");`.
+      This must NOT be allowed, per https://github.com/whatwg/html/commit/2a11eef8f92b0335328890dc2cb1e281d18553eb
+
+/-->
 <title>Same-origin navigation started from unload handler</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <iframe src="navigation_unload_same_origin-1.html"></iframe>
 <script>
-var t = async_test();
-onload = t.step_func(function() {
-  var iframe = document.getElementsByTagName("iframe")[0];
-  var new_src = iframe.src.replace(/[^\/\.]*\.html/, "001-2.html");
-  iframe.src = new_src;
+var test = async_test();
+window.onload = test.step_func(function() {
+  var iframe = document.querySelector("iframe");
+  iframe.src = iframe.src.replace(/[^\/\.]*\.html/, "001-2.html");
 });
 
-onmessage = t.step_func(function(e) {
+window.onmessage = test.step_func(function(e) {
   assert_equals(e.data, "001-2");
-  t.done();
+  test.done();
 });
-
 </script>

@@ -1,21 +1,34 @@
 <!doctype html>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+    steps: [3, 4, 6]
+
+description: |
+  1. 003.html has an `onmessage` handler to receive messages and store them in `messages`.
+  2. 003-1.html has an `onload` handler, which sends the message "003-1" to 003.html (`messages` will be `["003-1"]`), then sets `location` to 003-2.html ~100ms later
+  3. 003-2.html has an `onunload` handler, which sets `location` to 003-3.html. This `onunload` will be triggered by `history.go(-1)`, but the attempt to set `location` to 003-3.html. This must NOT be allowed, per https://github.com/whatwg/html/commit/2a11eef8f92b0335328890dc2cb1e281d18553eb.
+  4. 003-2.html has an `onload` handler, which sends the message "003-2" to 003.html (`messages` will be `["003-1", "003-2"]`), then calls `history.go(-1)` after a 0ms timeout.
+    a. `history.go(-1)` navigates browsingContext to the last _session history entry_ (003-1.html).
+    b. 003-1.html has an `onload` handler, which sends the message "003-1" to 003.html. Now `messages` will be `["003-1", "003-2", "003-1"]`, which satisfies the condition in the handler that then compares `messages` to an expected array of values, ends the test and removes the iframe.
+      i. Removal of the iframe prevents the function in the ~100ms timeout from being executed.
+
+/-->
 <title>Navigation from unload whilst traversing history</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <iframe src="003-1.html"></iframe>
 <script>
-var t = async_test();
+var test = async_test();
+var iframe = document.querySelector("iframe");
+var messages = [];
 
-var pages = [];
-var iframe = document.getElementsByTagName("iframe")[0];
-
-
-onmessage = t.step_func(function(e) {
-  pages.push(e.data);
-  if(pages.length == 3) {
-    assert_array_equals(pages, ["003-1", "003-2", "003-1"]);
-    t.done();
+window.onmessage = test.step_func(function(e) {
+  messages.push(e.data);
+  if (messages.length === 3) {
+    assert_array_equals(messages, ["003-1", "003-2", "003-1"]);
+    test.done();
     iframe.parentNode.removeChild(iframe);
   }
 });

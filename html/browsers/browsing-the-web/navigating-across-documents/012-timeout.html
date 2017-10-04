@@ -1,0 +1,33 @@
+<!doctype html>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+    steps: [6]
+
+description: |
+  1. This test creates an anchor with both an onclick and href.
+  2. The test "clicks" the anchor, triggering the onclick handler operation,
+      which will attempt to document.write (after a 2s delay), followed by
+      navigating the iframe to the anchor's `href=""`.
+
+/-->
+<title>Link with onclickwith delayed (timeout) document.write and href navigation</title>
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<div id="log"></div>
+<iframe id="test" name="test"></iframe>
+<a target="test" onclick="setTimeout(() => document.write('<script>parent.postMessage(&quot;write&quot;, &quot;*&quot;)</script>'), 2000);" href="href.html">Test</a>
+<script>
+var test = async_test(undefined, {
+  timeout: 4000
+});
+
+test.step(function() {
+  document.querySelector("a").click();
+});
+
+window.onmessage = test.step_func(function(e) {
+  assert_equals(e.data, "href");
+  test.done();
+});
+</script>

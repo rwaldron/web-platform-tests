@@ -1,20 +1,36 @@
 <!doctype html>
+<!--/
+specs:
+  - id: browsing-the-web.html#scroll-to-fragid
+  - id: browsing-the-web.html#the-indicated-part-of-the-document
+    steps: [2]
+
+description: |
+  1. Creates an iframe with src="empty_fragment_iframe.html"
+  2. empty_fragment_iframe.html attempts to navigate to an empty fragment
+      by setting `location.hash = ""`, which will abort the navigation.
+/-->
+
 <meta charset="utf-8">
 <title>Navigating to the same URL with an empty fragment aborts the navigation</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
-<iframe src="empty_fragment_iframe.html"></iframe>
+<div id="log"></div>
+<iframe  id="test" name="test" src="empty_fragment_iframe.html"></iframe>
 <script>
-// If the navigation were not aborted, we would expect multiple load events
-// as the page continually reloads itself.
-async_test(function(t) {
-  var count = 0;
-  var iframe = document.querySelector('iframe');
-  iframe.onload = t.step_func(function() {
-    count++;
-  });
-  window.child_succeeded = t.step_func_done(function() {
-    assert_equals(count, 1);
-  });
+var test = async_test();
+var count = 0;
+var iframe = document.querySelector('iframe');
+
+iframe.onload = test.step_func(function() {
+  // If the navigation were not aborted, we would expect multiple load events
+  // as the page continually reloads itself.
+  count++;
+});
+
+window.onmessage = test.step_func(function(e) {
+  assert_equals(e.data, "");
+  assert_equals(count, 1);
+  test.done();
 });
 </script>

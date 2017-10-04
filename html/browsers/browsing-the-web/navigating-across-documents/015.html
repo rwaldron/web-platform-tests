@@ -1,20 +1,39 @@
 <!doctype html>
-<title> Link with javascript onclick and href script order </title>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+    steps: [12]
+  - id: browsing-the-web.html#javascript-protocol
+  - id: text-level-semantics.html#the-a-element
+  - id: webappapis.html#the-event-handler-processing-algorithm
+  - id: iframe-embed-object.html#the-iframe-element:about:blank
+
+description: |
+  1. This test creates an anchor with an href containing a javascript: url.
+  2. The test "clicks" the anchor, triggering the javascript: href navigation,
+      which must be evaluated and executed asynchronously.
+  3. location.href is used to prove that the `javascript:` url's contents
+      are executed in the iframe.
+
+/-->
+<title>Link with onclick and href javascript: url, order of execution</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <iframe id="test" name="test"></iframe>
-<a target="test" onclick="parent.events.push('click');" href="javascript:parent.events.push('href')">Test</a>
+<a target="test" onclick="parent.reports.push('click');" href="javascript:parent.reports.push(location.href);">Test</a>
 <script>
-var t = async_test(undefined, {timeout:4000});
-var events = [];
-t.step(function() {
-  document.getElementsByTagName("a")[0].click();
-  events.push('after script');
+var test = async_test(undefined, {
+  timeout:4000
 });
-onload = t.step_func(function() {
+var reports = [];
+test.step(function() {
+  document.querySelector("a").click();
+  reports.push("after click");
+});
+window.onload = test.step_func(function() {
   // javascript: executions are async.
-  assert_array_equals(events, ['click', 'after script', 'href']);
-  t.done();
+  assert_array_equals(reports, ["click", "after click", "about:blank"]);
+  test.done();
 });
 </script>

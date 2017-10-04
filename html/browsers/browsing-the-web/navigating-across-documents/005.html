@@ -1,16 +1,30 @@
 <!doctype html>
-<title>Link with onclick navigation and href navigation </title>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+    steps: [6]
+
+description: |
+  1. This test creates a form with `target="test"` and an anchor with both an onclick and href.
+  2. The test "clicks" the anchor, which will trigger the onclick handler operation,
+      which will attempt to set the location of the iframe.
+  3. Navigating to the anchor's `href=""` will abort the not-yet-mature location navigation.
+
+/-->
+<title>Link with onclick navigation is aboprted by href navigation </title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <iframe id="test" name="test"></iframe>
 <a target="test" onclick="document.getElementById('test').contentWindow.location='click.html'" href="href.html">Test</a>
 <script>
-var t = async_test();
-t.step(function() {document.links[0].click()});
-onmessage = t.step_func(
+var test = async_test();
+test.step(function() {
+  document.querySelector("a").click();
+});
+window.onmessage = test.step_func(
   function(e) {
     assert_equals(e.data, "href");
-    t.done();
+    test.done();
   });
 </script>

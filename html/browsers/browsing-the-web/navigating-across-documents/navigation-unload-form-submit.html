@@ -1,24 +1,43 @@
 <!DOCTYPE html>
+<!--/
+specs:
+  - id: browsers.html#navigating-across-documents
+    steps: [6]
+
+description: |
+  Similar to 006, 008 & 009.
+
+  1. Creates an iframe with src="navigation-unload-form-submit-1.html".
+  2. navigation-unload-form-submit-1.html sends a message "submit-1"; it
+      also contains a form with action="navigation-unload-form-submit-2.html"
+      that will be submitted, an unload handler that will attempt to set
+      location to "submit.html". This must NOT be allowed, per
+      https://github.com/whatwg/html/commit/2a11eef8f92b0335328890dc2cb1e281d18553eb.
+/-->
 <meta charset="utf-8">
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <link rel="help" href="https://html.spec.whatwg.org/multipage/browsers.html#navigating-across-documents">
 <link rel="author" title="Domenic Denicola" href="mailto:d@domenic.me">
 
-<iframe id="i" src="navigation-unload-form-submit-1.html"></iframe>
+<iframe src="navigation-unload-form-submit-1.html"></iframe>
 
 <!-- derived from https://bugzilla.mozilla.org/show_bug.cgi?id=247660#c0 -->
 
 <script>
-var test = async_test('Tests that navigation during an unload caused by a form submit does nothing');
-window.onload = test.step_func(function() {
-    var i = document.querySelector('#i');
+var test = async_test('Disallow navigation during an unload caused by a form submit');
+var messages = [];
+var iframe = document.querySelector('iframe');
 
-    window.finishedLoading = test.step_func_done(function () {
-        assert_equals(i.contentWindow.location.pathname.split('/').pop(), 'navigation-unload-form-submit-2.html');
-        assert_equals(i.contentWindow.location.hash, '');
-    });
-
-    i.contentWindow.document.querySelector('input[type="submit"]').click();
+window.onmessage = test.step_func(function(e) {
+  messages.push(e.data);
+  if (messages.length === 2) {
+    assert_array_equals(messages, ["submit-1", "submit-2"]);
+    assert_equals(
+      iframe.contentWindow.location.pathname.endsWith("navigation-unload-form-submit-2.html"),
+      true
+    );
+    test.done();
+  }
 });
 </script>

@@ -1,16 +1,27 @@
 <!doctype html>
-<title>Link with onclick javascript url and href navigation </title>
+<!--/
+specs:
+  - id: browsing-the-web.html#navigating-across-documents
+    steps: [6]
+
+description: |
+  This test is operationally equivalent to 005.html with the exeption that the
+  click handler attempts to document.write a script into the iframe.
+
+/-->
+<title>Link with onclick document.write is aborted by href navigation</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
 <iframe id="test" name="test"></iframe>
-<a target="test" onclick="document.getElementById('test').contentWindow.location = 'javascript:\'abc<script>parent.postMessage(&quot;click&quot;, &quot;*&quot;)</script>\'';" href="href.html">Test</a>
+<a target="test" onclick="document.getElementById('test').contentWindow.document.write('<script>self.postMessage(&quot;click&quot;, &quot;*&quot;)</script>');" href="href.html">Test</a>
 <script>
-var t = async_test();
-t.step(function() {document.getElementsByTagName("a")[0].click()});
-onmessage = t.step_func(
-  function(e) {
-    assert_equals(e.data, "href");
-    t.done();
-  });
+var test = async_test();
+test.step(function() {
+  document.querySelector("a").click();
+});
+onmessage = test.step_func(function(e) {
+  assert_equals(e.data, "href");
+  test.done();
+});
 </script>

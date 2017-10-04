@@ -10,20 +10,26 @@ specs:
   - id: form-control-infrastructure.html#planned-navigation
 
 description: |
-  This test is operationally equivalent to 005.html with the exeption that
-  this test creates a form element with `target="test"` and `action="click.html"`,
-  which are used to initiate navigation.
-
+  This test expects the form's `action`, which contains a sync XMLHttpRequest (delayed by 2 seconds) to be aborted by navigating to the anchor's `href`.
 /-->
-<title>Link with onclick form submit is aborted by href navigation </title>
+<title>Link with onclick form submit to javascript: url with delayed (sync xhr) document.write and href navigation</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <div id="log"></div>
-<iframe name="test"></iframe>
-<form target="test" action="click.html"></form>
+<iframe id="test" name="test"></iframe>
+<!--
+  http://wptserve.readthedocs.io/en/latest/pipes.html
+
+  - pipe=trickle(d2) will create a 2 second delay
+  - the XMLHttpRequest is async=false
+-->
+<form target="test" action="javascript:(function() {var x = new XMLHttpRequest(); x.open('GET', 'blank.html?pipe=trickle(d2)', false); x.send(); document.write('<script>parent.postMessage(&quot;write&quot;, &quot;*&quot;)</script>');})()"></form>
+
 <a target="test" onclick="document.forms[0].submit()" href="href.html">Test</a>
 <script>
-var test = async_test();
+var test = async_test(undefined, {
+  timeout: 4000
+});
 
 test.step(function() {
   document.querySelector("a").click();
